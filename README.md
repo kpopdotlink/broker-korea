@@ -25,6 +25,43 @@ KIS OpenAPI를 통해 실전/모의 투자 환경에서 주식, 선물옵션, �
 | `get_positions()` | 국내주식 잔고조회 | ✅ |
 | `submit_order()` | 국내주식 현금매수/매도 | ✅ |
 
+## Persona 연동
+
+KL Investment v0.8.9부터 **Persona(가상 서브계좌)** 기능을 지원합니다.
+하나의 실제 KIS 계좌를 여러 개의 독립적인 가상 포트폴리오로 분리하여 운용할 수 있습니다.
+
+### Persona 생성 예시
+
+```json
+// RPC: personas.create
+{
+  "name": "성장주 포트폴리오",
+  "broker_id": "broker-korea",
+  "broker_account_id": "12345678-01",
+  "budget": 10000000
+}
+```
+
+### 브로커 초기화 예시
+
+```json
+// RPC: plugins.initializeBroker
+{
+  "plugin_id": "broker-korea",
+  "credentials": {
+    "app_key": "PSxxxxxxxx",
+    "app_secret": "xxxxxxxxxxxxxxxx",
+    "account_no": "12345678-01"
+  }
+}
+
+// RPC: plugins.getBrokerStatus
+{ "plugin_id": "broker-korea" }
+// Response: { "enabled": true, "initialized": true, "has_credentials": true }
+```
+
+---
+
 ## 설정
 
 ### 1. KIS Developers 앱 등록
@@ -32,9 +69,24 @@ KIS OpenAPI를 통해 실전/모의 투자 환경에서 주식, 선물옵션, �
 1. [KIS Developers](https://apiportal.koreainvestment.com)에서 앱 등록
 2. 모의투자 또는 실전투자 앱키 발급
 
-### 2. Secrets 설정
+### 2. 브로커 초기화 (권장)
 
-KL Investment 앱에서 다음 secrets 설정:
+KL Investment 앱에서 `plugins.initializeBroker` RPC를 호출하면 인증정보가 안전하게 Vault에 저장됩니다:
+
+```json
+{
+  "plugin_id": "broker-korea",
+  "credentials": {
+    "app_key": "PSxxxxxxxx",
+    "app_secret": "xxxxxxxxxxxxxxxx",
+    "account_no": "12345678-01"
+  }
+}
+```
+
+### 2-1. 수동 Secrets 설정 (대안)
+
+직접 Secrets를 설정하는 경우:
 
 ```
 broker-korea:app_key      - 발급받은 앱키

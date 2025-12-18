@@ -2,12 +2,17 @@
     "id": "broker-korea",
     "name": "Korea Broker",
     "version": "0.1.0",
-    "description": "Korean securities broker integration plugin.",
+    "description": "Korean securities broker integration plugin (KIS OpenAPI).",
     "type": "broker",
     "permissions": [
         "broker:read",
         "broker:trade",
-        "secrets:read"
+        "secrets:read",
+        "network:https"
+    ],
+    "allowed_hosts": [
+        "openapi.koreainvestment.com",
+        "openapivts.koreainvestment.com"
     ],
     "core": {
         "min": "0.1.0"
