@@ -1,0 +1,17 @@
+{
+    "id": "broker-korea",
+    "name": "Korea Broker",
+    "version": "0.1.0",
+    "description": "Korean securities broker integration plugin.",
+    "type": "broker",
+    "permissions": [
+        "broker:read",
+        "broker:trade",
+        "secrets:read"
+    ],
+    "core": {
+        "min": "0.1.0"
+    },
+    "entry_point": "broker_korea.wasm",
+    "api_version": "0.3.0"
+}

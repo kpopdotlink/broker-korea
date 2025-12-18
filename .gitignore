@@ -1,0 +1,16 @@
+# Build artifacts
+/target
+*.wasm
+
+# IDE
+.idea
+.vscode
+*.swp
+
+# Secrets (NEVER commit)
+.env
+*.vault
+secrets.json
+
+# OS
+.DS_Store
