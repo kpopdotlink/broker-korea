@@ -3,6 +3,9 @@ name = "broker-korea"
 version = "0.1.0"
 edition = "2021"
 
+# Exclude from parent workspace (independent build)
+[workspace]
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
