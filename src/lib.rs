@@ -3,13 +3,16 @@
 //! This plugin provides integration with Korean securities brokers.
 //! Implements the standard broker plugin interface.
 
+mod http;
+mod kis;
+
 use chrono::Utc;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::slice;
 use std::sync::Mutex;
 
-use models::order::{Order, OrderStatus, OrderType};
+use models::order::{Order, OrderStatus};
 use models::portfolio::{AccountBalance, AccountSummary, Position};
 use plugin_api::{
     GetAccountsRequest, GetAccountsResponse, GetPositionsRequest, GetPositionsResponse,
@@ -20,6 +23,7 @@ use plugin_api::{
 
 /// Broker configuration loaded from secrets
 #[derive(Debug, Clone, Default)]
+#[allow(dead_code)]
 struct BrokerConfig {
     app_key: String,
     app_secret: String,
@@ -73,19 +77,23 @@ pub extern "C" fn initialize(ptr: i32, len: i32) -> u64 {
 
     // Parse configuration from secrets
     let config = BrokerConfig {
-        app_key: config_json.get("app_key")
+        app_key: config_json
+            .get("app_key")
             .and_then(|v| v.as_str())
             .unwrap_or_default()
             .to_string(),
-        app_secret: config_json.get("app_secret")
+        app_secret: config_json
+            .get("app_secret")
             .and_then(|v| v.as_str())
             .unwrap_or_default()
             .to_string(),
-        account_no: config_json.get("account_no")
+        account_no: config_json
+            .get("account_no")
             .and_then(|v| v.as_str())
             .unwrap_or_default()
             .to_string(),
-        is_paper: config_json.get("is_paper")
+        is_paper: config_json
+            .get("is_paper")
             .and_then(|v| v.as_bool())
             .unwrap_or(true),
     };
