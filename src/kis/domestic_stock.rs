@@ -11,7 +11,6 @@ use super::{
     KisClient,
 };
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 /// 현금 매수/매도 주문 요청
 #[derive(Debug, Clone, Serialize)]
