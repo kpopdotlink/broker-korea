@@ -3,6 +3,9 @@
 //! This plugin provides integration with Korea Investment & Securities (KIS) broker.
 //! Implements the standard broker plugin interface.
 
+// Allow dead_code for structs/fields prepared for future API integration
+#![allow(dead_code)]
+
 mod http;
 mod kis;
 
@@ -74,7 +77,7 @@ pub extern "C" fn alloc(len: i32) -> i32 {
 pub extern "C" fn initialize(ptr: i32, len: i32) -> u64 {
     let config_json: serde_json::Value = parse_request(ptr, len);
 
-    let mut state = STATE.lock().unwrap();
+    let mut state = STATE.lock().unwrap_or_else(|e| e.into_inner());
 
     // Parse configuration from secrets
     let app_key = config_json
@@ -133,7 +136,7 @@ pub extern "C" fn initialize(ptr: i32, len: i32) -> u64 {
 pub extern "C" fn get_accounts(ptr: i32, len: i32) -> u64 {
     let _req: GetAccountsRequest = parse_request(ptr, len);
 
-    let mut state = STATE.lock().unwrap();
+    let mut state = STATE.lock().unwrap_or_else(|e| e.into_inner());
 
     let client = match state.client.as_mut() {
         Some(c) => c,
@@ -238,7 +241,7 @@ pub extern "C" fn get_accounts(ptr: i32, len: i32) -> u64 {
 pub extern "C" fn get_positions(ptr: i32, len: i32) -> u64 {
     let req: GetPositionsRequest = parse_request(ptr, len);
 
-    let mut state = STATE.lock().unwrap();
+    let mut state = STATE.lock().unwrap_or_else(|e| e.into_inner());
 
     // Copy account_no before borrowing client
     let account_no = state.account_no.clone();
@@ -292,7 +295,7 @@ pub extern "C" fn get_positions(ptr: i32, len: i32) -> u64 {
 #[no_mangle]
 pub extern "C" fn submit_order(ptr: i32, len: i32) -> u64 {
     let req: SubmitOrderRequest = parse_request(ptr, len);
-    let mut state = STATE.lock().unwrap();
+    let mut state = STATE.lock().unwrap_or_else(|e| e.into_inner());
 
     let client = match state.client.as_mut() {
         Some(c) => c,
@@ -416,7 +419,10 @@ fn create_error_order(req: &SubmitOrderRequest, error: &str) -> Order {
         filled_quantity: 0.0,
         extensions: Some({
             let mut map = HashMap::new();
-            map.insert("error".to_string(), serde_json::Value::String(error.to_string()));
+            map.insert(
+                "error".to_string(),
+                serde_json::Value::String(error.to_string()),
+            );
             map
         }),
         persona_id: req.order.persona_id.clone(),
